@@ -6,6 +6,7 @@
                 <ui:ThemeResources />
                 <ui:XamlControlsResources />
                 <!-- Other merged dictionaries here -->
+                <ResourceDictionary Source="/style/Light.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <!-- Other app resources here -->
         </ResourceDictionary>

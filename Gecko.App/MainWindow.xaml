@@ -1,22 +1,40 @@
-﻿<Window x:Class="Gecko.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:ui="http://schemas.modernwpf.com/2019" ui:WindowHelper.UseModernWindowStyle="True" mc:Ignorable="d" Title="MainWindow" Height="450" Width="300">
+﻿<Window x:Class="Gecko.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:MUI="http://schemas.modernwpf.com/2019" MUI:WindowHelper.UseModernWindowStyle="True" mc:Ignorable="d" Title="MainWindow" Height="450" Width="300">
     
     <Grid>
-        <ui:AutoSuggestBox Grid.Row="0" Margin="12" PlaceholderText="Search" QueryIcon="Find" />
-        <ui:ScrollViewerEx Grid.Row="1" Margin="12 0 12 12">
-            <ui:ListView SelectionMode="Multiple" BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"/>
-        </ui:ScrollViewerEx>
-        <ui:SimpleStackPanel Grid.Row="2" Margin="12" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="6">
+        <MUI:AutoSuggestBox Grid.Row="0" PlaceholderText="Search">
+            <MUI:AutoSuggestBox.Style>
+                <Style TargetType="MUI:AutoSuggestBox">
+                    <Setter Property="Margin" Value="8 6" />
+                    <Setter Property="QueryIcon" Value="Find" />
+                    <Setter Property="BorderBrush" Value="{StaticResource BorderColorBrush}"/>
+                </Style>
+            </MUI:AutoSuggestBox.Style>
+        </MUI:AutoSuggestBox>
+        
+        <MUI:ListView Grid.Row="1" SelectionMode="Multiple">
+            <MUI:ListView.Style>
+                <Style TargetType="MUI:ListView">
+                    <Setter Property="Margin" Value="8 2" />
+                    <Setter Property="BorderBrush" Value="{StaticResource BorderColorBrush}" />
+                    <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+                    <Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThickness}" />
+                </Style>
+            </MUI:ListView.Style>
+        </MUI:ListView>
+        
+        
+        <MUI:SimpleStackPanel Grid.Row="2" Margin="12" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="6">
             <Button Content="Select all" />
-            <ui:DropDownButton Content="Choose action">
-               <ui:DropDownButton.Flyout>
-                   <ui:MenuFlyout Placement="BottomEdgeAlignedLeft">
+            <MUI:DropDownButton Content="Choose action">
+               <MUI:DropDownButton.Flyout>
+                   <MUI:MenuFlyout Placement="BottomEdgeAlignedLeft">
                        <MenuItem Header="Move selected files" />
                        <MenuItem Header="Delete selected files" />
                        <MenuItem Header="Rename selected files" />
-                   </ui:MenuFlyout>
-               </ui:DropDownButton.Flyout>
-           </ui:DropDownButton>
-        </ui:SimpleStackPanel>
+                   </MUI:MenuFlyout>
+               </MUI:DropDownButton.Flyout>
+           </MUI:DropDownButton>
+        </MUI:SimpleStackPanel>
             
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
