@@ -40,7 +40,7 @@
         </MUI:ListView>
         
         <MUI:SimpleStackPanel Grid.Row="2">
-            <Button Content="Select all" />
+            <Button Content="Select all" Command="{Binding SelectAllCommand}"/>
             <MUI:DropDownButton Content="Choose action">
                <MUI:DropDownButton.Flyout>
                    <MUI:MenuFlyout Placement="BottomEdgeAlignedLeft">
