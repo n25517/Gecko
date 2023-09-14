@@ -13,8 +13,7 @@ namespace Gecko.App.ViewModel
 
         public MainViewModel()
         {
-            const string _root = @"E:\Music"; // TODO: Test path
-            _files = Explorer.GetFileItemsOnPath(_root, "*");
+            _files = Explorer.GetFileItemsOnPath(App.Args["--path"], App.Args.TryGetValue("--pattern", out var value) ? value : "*");
         }
 
         [RelayCommand]
