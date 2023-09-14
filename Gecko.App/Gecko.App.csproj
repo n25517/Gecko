@@ -8,13 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="src\Model\" />
-      <Folder Include="src\Repository\" />
-      <Folder Include="src\ViewModel\" />
-    </ItemGroup>
-
-    <ItemGroup>
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
       <PackageReference Include="ModernWpfUI" Version="0.9.6" />
     </ItemGroup>
+
 
 </Project>

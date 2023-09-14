@@ -1,24 +1,42 @@
-﻿<Window x:Class="Gecko.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:MUI="http://schemas.modernwpf.com/2019" MUI:WindowHelper.UseModernWindowStyle="True" mc:Ignorable="d" Title="MainWindow" Height="450" Width="300">
+﻿<Window x:Class="Gecko.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:MUI="http://schemas.modernwpf.com/2019" MUI:WindowHelper.UseModernWindowStyle="True" xmlns:ViewModel="clr-namespace:Gecko.App.ViewModel" mc:Ignorable="d" Title="MainWindow" Height="450" Width="300">
+    <Window.DataContext>
+        <ViewModel:MainViewModel />
+    </Window.DataContext>
     
     <Grid>
-        <MUI:AutoSuggestBox Grid.Row="0" PlaceholderText="Search">
+        <MUI:AutoSuggestBox Grid.Row="0">
             <MUI:AutoSuggestBox.Style>
                 <Style TargetType="MUI:AutoSuggestBox">
                     <Setter Property="Margin" Value="8 6" />
                     <Setter Property="QueryIcon" Value="Find" />
+                    <Setter Property="PlaceholderText" Value="Search" />
                     <Setter Property="BorderBrush" Value="{StaticResource BorderColorBrush}"/>
                 </Style>
             </MUI:AutoSuggestBox.Style>
         </MUI:AutoSuggestBox>
-        <MUI:ListView Grid.Row="1" SelectionMode="Multiple">
+        <MUI:ListView Grid.Row="1" ItemsSource="{Binding Files}">
             <MUI:ListView.Style>
                 <Style TargetType="MUI:ListView">
                     <Setter Property="Margin" Value="8 2" />
                     <Setter Property="BorderBrush" Value="{StaticResource BorderColorBrush}" />
                     <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
                     <Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThickness}" />
+                    <Setter Property="SelectionMode" Value="Multiple" />
                 </Style>
             </MUI:ListView.Style>
+            <MUI:ListView.ItemTemplate>
+                <ItemContainerTemplate>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="{Binding Name}" FontSize="12" />
+                        <TextBlock Text="{Binding Extension}" FontSize="9" />
+                    </StackPanel>
+                </ItemContainerTemplate>
+            </MUI:ListView.ItemTemplate>
+            <MUI:ListView.ItemContainerStyle>
+                <Style TargetType="MUI:ListViewItem">
+                    <Setter Property="IsSelected" Value="{Binding IsSelected}" />
+                </Style>
+            </MUI:ListView.ItemContainerStyle>
         </MUI:ListView>
         
         <MUI:SimpleStackPanel Grid.Row="2">
