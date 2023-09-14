@@ -10,7 +10,6 @@
                 </Style>
             </MUI:AutoSuggestBox.Style>
         </MUI:AutoSuggestBox>
-        
         <MUI:ListView Grid.Row="1" SelectionMode="Multiple">
             <MUI:ListView.Style>
                 <Style TargetType="MUI:ListView">
@@ -22,8 +21,7 @@
             </MUI:ListView.Style>
         </MUI:ListView>
         
-        
-        <MUI:SimpleStackPanel Grid.Row="2" Margin="12" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="6">
+        <MUI:SimpleStackPanel Grid.Row="2">
             <Button Content="Select all" />
             <MUI:DropDownButton Content="Choose action">
                <MUI:DropDownButton.Flyout>
@@ -34,6 +32,15 @@
                    </MUI:MenuFlyout>
                </MUI:DropDownButton.Flyout>
            </MUI:DropDownButton>
+            
+            <MUI:SimpleStackPanel.Style>
+                <Style TargetType="MUI:SimpleStackPanel">
+                    <Setter Property="Margin" Value="8 4 8 6" />
+                    <Setter Property="Spacing" Value="4" />
+                    <Setter Property="Orientation" Value="Horizontal" />
+                    <Setter Property="HorizontalAlignment" Value="Right" />
+                </Style>
+            </MUI:SimpleStackPanel.Style>
         </MUI:SimpleStackPanel>
             
         <Grid.RowDefinitions>
