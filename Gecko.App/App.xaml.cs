@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Collections.Generic;
+using Forms = System.Windows.Forms;
 
 namespace Gecko.App
 {
@@ -15,8 +16,15 @@ namespace Gecko.App
 
             if (!Args.ContainsKey("--path"))
             {
-                MessageBox.Show("Path is not specified");
-                this.Shutdown();
+                using (var dialog = new Forms.FolderBrowserDialog())
+                {
+                    if (dialog.ShowDialog() != Forms.DialogResult.OK)
+                    {
+                        this.Shutdown();
+                    }
+                    
+                    Args.Add("--path", dialog.SelectedPath);
+                }
             }
         }
 

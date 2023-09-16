@@ -1,10 +1,18 @@
-﻿<Window x:Class="Gecko.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:MUI="http://schemas.modernwpf.com/2019" MUI:WindowHelper.UseModernWindowStyle="True" xmlns:ViewModel="clr-namespace:Gecko.App.ViewModel" mc:Ignorable="d" Title="MainWindow" Height="450" Width="300">
+﻿<Window x:Class="Gecko.App.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:i="http://schemas.microsoft.com/xaml/behaviors" xmlns:MUI="http://schemas.modernwpf.com/2019" MUI:WindowHelper.UseModernWindowStyle="True" xmlns:ViewModel="clr-namespace:Gecko.App.ViewModel" mc:Ignorable="d" Title="MainWindow" Height="450" Width="300">
     <Window.DataContext>
         <ViewModel:MainViewModel />
     </Window.DataContext>
     
     <Grid>
-        <MUI:AutoSuggestBox Grid.Row="0">
+        <MUI:AutoSuggestBox x:Name="SearchBox" Grid.Row="0">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="QuerySubmitted">
+                    <i:InvokeCommandAction Command="{Binding SearchQueryCommand}" CommandParameter="{Binding Text, ElementName=SearchBox}" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="TextChanged">
+                    <i:InvokeCommandAction Command="{Binding SearchTextChangeCommand}" CommandParameter="{Binding Text, ElementName=SearchBox}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <MUI:AutoSuggestBox.Style>
                 <Style TargetType="MUI:AutoSuggestBox">
                     <Setter Property="Margin" Value="8 6" />
@@ -14,7 +22,7 @@
                 </Style>
             </MUI:AutoSuggestBox.Style>
         </MUI:AutoSuggestBox>
-        <MUI:ListView Grid.Row="1" ItemsSource="{Binding Files}">
+        <MUI:ListView Grid.Row="1" ItemsSource="{Binding FilteredFiles}">
             <MUI:ListView.Style>
                 <Style TargetType="MUI:ListView">
                     <Setter Property="Margin" Value="8 2" />
