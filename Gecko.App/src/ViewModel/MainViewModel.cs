@@ -1,41 +1,26 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Windows;
 using Gecko.App.Model;
 using Gecko.App.Repository;
-using System.ComponentModel;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using CommunityToolkit.Mvvm.Input;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Data;
-using System.Windows.Forms;
-using System.Windows.Threading;
+using CommunityToolkit.Mvvm.Input;
+using Forms = System.Windows.Forms;
+using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Application = System.Windows.Application;
-using MessageBox = System.Windows.MessageBox;
 
 namespace Gecko.App.ViewModel
 {
     public partial class MainViewModel: ObservableObject
     {
         [ObservableProperty]
-        private ICollectionView _files;
-        private readonly ObservableCollection<FileItem> _source;
-
-        public MainViewModel()
-        {
-            _source = Explorer.GetFileItemsOnPath(App.Args["--path"]);
-            _files = CollectionViewSource.GetDefaultView(_source);
-        }
-
+        private FileItems _files = new(Explorer.GetFileItemsOnPath(App.Args["--path"]));
+        
         [RelayCommand]
         private void SelectAll()
         {
-            foreach (FileItem file in Files)
+            foreach (FileItem file in Files.Filtered)
             {
-                file.IsSelected = true;
+                file.IsSelected = !file.IsSelected;
             }
         }
         
@@ -49,8 +34,8 @@ namespace Gecko.App.ViewModel
             
             try
             {
-                Files.Filter = o => Regex.Match((o as FileItem)!.FullName!, search).Success;
-                Files.Refresh();
+                Files.Filtered.Filter = o => Regex.Match((o as FileItem)!.FullName, search).Success;
+                Files.Filtered.Refresh();
             }
             catch (RegexParseException e)
             {
@@ -66,45 +51,45 @@ namespace Gecko.App.ViewModel
                 return;
             }
             
-            Files.Filter = null;
-            Files.Refresh();
+            Files.Filtered.Filter = null;
+            Files.Filtered.Refresh();
         }
 
+         
+        
         [RelayCommand]
-        private void MoveSelectedFiles()
+        private void MoveSelected()
         {
-            var items = Files.Cast<FileItem>().Where(file => file.IsSelected);
-            using (var dialog = new FolderBrowserDialog())
+            using var dialog = new Forms.FolderBrowserDialog();
+            if (dialog.ShowDialog() != Forms.DialogResult.OK)
             {
-                if (dialog.ShowDialog() == DialogResult.OK)
-                {
-                    if (dialog.SelectedPath.Contains(App.Args["--path"]))
-                    {
-                        MessageBox.Show("Please, select another path");
-                    }
-                    else
-                    {
-                        Parallel.ForEach(items, item =>
-                        {
-                            File.Move(Path.GetFullPath(item.Path),dialog.SelectedPath + Path.DirectorySeparatorChar + item.FullName, true);
-                            Application.Current.Dispatcher.BeginInvoke(() => _source.Remove(item));
-                        });
-                    }
-                }
+                MessageBox.Show("Please, select path");
+                return;
             }
+            
+            if (dialog.SelectedPath.Contains(App.Args["--path"]))
+            {
+                MessageBox.Show("Please, select another path");
+                return;
+            }
+            
+            Parallel.ForEach(Files.GetSelectedFiles(), item =>
+            {
+                File.Move(Path.GetFullPath(item.Path),dialog.SelectedPath + Path.DirectorySeparatorChar + item.FullName, true);
+                App.Current.Dispatcher.BeginInvoke(() => Files.Source.Remove(item));
+            });
         }
         
         [RelayCommand]
-        private void DeleteSelectedFiles()
+        private void DeleteSelected()
         {
-            var items = Files.Cast<FileItem>().Where(file => file.IsSelected);
-            Parallel.ForEach(items, item =>
+            Parallel.ForEach(Files.GetSelectedFiles(), item =>
             {
                 File.Delete(Path.GetFullPath(item.Path));
-                Application.Current.Dispatcher.BeginInvoke(() => _source.Remove(item));
+                App.Current.Dispatcher.BeginInvoke(() => Files.Source.Remove(item));
             });
             
-            Files.Refresh();
+            Files.Filtered.Refresh();
         }
     }
 }

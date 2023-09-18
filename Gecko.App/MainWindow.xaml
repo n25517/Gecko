@@ -22,7 +22,7 @@
                 </Style>
             </MUI:AutoSuggestBox.Style>
         </MUI:AutoSuggestBox>
-        <MUI:ListView Grid.Row="1" ItemsSource="{Binding Files}">
+        <MUI:ListView Grid.Row="1" ItemsSource="{Binding Files.Filtered}">
             <MUI:ListView.Style>
                 <Style TargetType="MUI:ListView">
                     <Setter Property="Margin" Value="8 2" />
@@ -52,8 +52,8 @@
             <MUI:DropDownButton Content="Choose action">
                <MUI:DropDownButton.Flyout>
                    <MUI:MenuFlyout Placement="BottomEdgeAlignedLeft">
-                       <MenuItem Header="Move selected files" Command="{Binding MoveSelectedFilesCommand}"/>
-                       <MenuItem Header="Delete selected files" Command="{Binding DeleteSelectedFilesCommand}" />
+                       <MenuItem Header="Move selected files" Command="{Binding MoveSelectedCommand}"/>
+                       <MenuItem Header="Delete selected files" Command="{Binding DeleteSelectedCommand}" />
                        <MenuItem Header="Rename selected files" />
                    </MUI:MenuFlyout>
                </MUI:DropDownButton.Flyout>
