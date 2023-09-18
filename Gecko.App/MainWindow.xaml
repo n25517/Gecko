@@ -22,7 +22,7 @@
                 </Style>
             </MUI:AutoSuggestBox.Style>
         </MUI:AutoSuggestBox>
-        <MUI:ListView Grid.Row="1" ItemsSource="{Binding FilteredFiles}">
+        <MUI:ListView Grid.Row="1" ItemsSource="{Binding Files}">
             <MUI:ListView.Style>
                 <Style TargetType="MUI:ListView">
                     <Setter Property="Margin" Value="8 2" />

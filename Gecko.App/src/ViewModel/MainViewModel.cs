@@ -1,10 +1,8 @@
 ﻿using System.Windows;
 using Gecko.App.Model;
-using System.Windows.Data;
 using Gecko.App.Repository;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -13,26 +11,17 @@ namespace Gecko.App.ViewModel
     public partial class MainViewModel: ObservableObject
     {
         [ObservableProperty]
-        private ObservableCollection<FileItem> _files;
-
-        [ObservableProperty]
-        private ICollectionView _filteredFiles;
-
-        public MainViewModel()
-        {
-            _files = Explorer.GetFileItemsOnPath(App.Args["--path"], App.Args.TryGetValue("--pattern", out var value) ? value : "*");
-            _filteredFiles = CollectionViewSource.GetDefaultView(Files);
-        }
+        private ICollectionView _files = Explorer.GetFileItemsOnPath(App.Args["--path"]);
 
         [RelayCommand]
         private void SelectAll()
         {
-            foreach (var file in FilteredFiles)
+            foreach (FileItem file in Files)
             {
-                (file as FileItem).IsSelected = true;
+                file.IsSelected = true;
             }
         }
-
+        
         [RelayCommand]
         private void SearchQuery(string? search)
         {
@@ -40,18 +29,18 @@ namespace Gecko.App.ViewModel
             {
                 return;
             }
-
+            
             try
             {
-                FilteredFiles.Filter = o => Regex.Match(((FileItem)o).FullName, search).Success;
-                FilteredFiles.Refresh();
+                Files.Filter = o => Regex.Match((o as FileItem)!.FullName!, search).Success;
+                Files.Refresh();
             }
             catch (RegexParseException e)
             {
-                MessageBox.Show(e.Message);
+                MessageBox.Show("Regular expression error", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
-
+        
         [RelayCommand]
         private void SearchTextChange(string? search)
         {
@@ -60,8 +49,8 @@ namespace Gecko.App.ViewModel
                 return;
             }
             
-            FilteredFiles.Filter = null;
-            FilteredFiles.Refresh();
+            Files.Filter = null;
+            Files.Refresh();
         }
     }
 }
