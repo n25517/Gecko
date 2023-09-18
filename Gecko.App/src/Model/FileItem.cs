@@ -4,14 +4,17 @@ namespace Gecko.App.Model
 {
     public partial class FileItem: ObservableObject
     {
+        [ObservableProperty]
+        private string _path;
+        
         [ObservableProperty] 
-        private string? _name;
+        private string _name;
 
         [ObservableProperty]
-        private string? _fullName;
+        private string _fullName;
 
         [ObservableProperty]
-        private string? _extension;
+        private string _extension;
         
         [ObservableProperty]
         private bool _isSelected = false;

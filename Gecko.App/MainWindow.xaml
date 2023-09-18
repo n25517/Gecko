@@ -52,8 +52,8 @@
             <MUI:DropDownButton Content="Choose action">
                <MUI:DropDownButton.Flyout>
                    <MUI:MenuFlyout Placement="BottomEdgeAlignedLeft">
-                       <MenuItem Header="Move selected files" />
-                       <MenuItem Header="Delete selected files" />
+                       <MenuItem Header="Move selected files" Command="{Binding MoveSelectedFilesCommand}"/>
+                       <MenuItem Header="Delete selected files" Command="{Binding DeleteSelectedFilesCommand}" />
                        <MenuItem Header="Rename selected files" />
                    </MUI:MenuFlyout>
                </MUI:DropDownButton.Flyout>
