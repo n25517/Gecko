@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Windows;
 using Gecko.App.Model;
 using Gecko.App.Modal;
@@ -23,7 +22,12 @@ namespace Gecko.App.ViewModel
         {
             foreach (FileItem file in Files.Filtered)
             {
-                file.IsSelected = !file.IsSelected;
+                if (file.IsSelected)
+                {
+                    continue;
+                }
+                
+                file.IsSelected = true;
             }
         }
         
@@ -57,8 +61,7 @@ namespace Gecko.App.ViewModel
             Files.Filtered.Filter = null;
             Files.Filtered.Refresh();
         }
-
-         
+        
         
         [RelayCommand]
         private void MoveSelected()
@@ -66,19 +69,14 @@ namespace Gecko.App.ViewModel
             using var dialog = new Forms.FolderBrowserDialog();
             if (dialog.ShowDialog() != Forms.DialogResult.OK)
             {
-                MessageBox.Show("Please, select path");
-                return;
-            }
-            
-            if (dialog.SelectedPath.Contains(App.Args["--path"]))
-            {
-                MessageBox.Show("Please, select another path");
                 return;
             }
             
             Parallel.ForEach(Files.GetSelectedFiles(), item =>
             {
-                File.Move(Path.GetFullPath(item.Path),dialog.SelectedPath + Path.DirectorySeparatorChar + item.FullName, true);
+                var path = dialog.SelectedPath + Path.DirectorySeparatorChar + item.FullName;
+                File.Move(Path.GetFullPath(item.Path),path, true);
+
                 App.Current.Dispatcher.BeginInvoke(() => Files.Source.Remove(item));
             });
         }
@@ -96,49 +94,29 @@ namespace Gecko.App.ViewModel
         }
 
         [RelayCommand]
-        private async void RenameSelected()
+        private async Task RenameSelected()
         {
             var rename = new RenameDialog();
             if (rename.DataContext is RenameViewModel)
             {
                 var result = await rename.ShowAsync();
                 var context = rename.DataContext as RenameViewModel;
-                
-                switch (result)
+
+                if (result == ContentDialogResult.Primary)
                 {
-                    case ContentDialogResult.Primary:
-                        Parallel.ForEach(Files.GetSelectedFiles(), item =>
+                    Parallel.ForEach(Files.GetSelectedFiles(), item =>
+                    {
+                        var name = Regex.Replace(item.FullName, context.Pattern, context.Replace);
+                        var destFileName = Path.GetFullPath(item.Path).Replace(item.FullName, name.Trim());
+                        
+                        File.Move(Path.GetFullPath(item.Path), destFileName, true);
+                        App.Current.Dispatcher.BeginInvoke(() =>
                         {
-                            var newValue = Regex.Replace(item.FullName, context.Pattern, context.Replace).Trim();
-
-                            File.Move(Path.GetFullPath(item.Path), Path.GetFullPath(item.Path).Replace(item.FullName, newValue), true);
-                            App.Current.Dispatcher.BeginInvoke(() =>
-                            {
-                                var index = Files.Source.IndexOf(item);
-                                if (index != -1)
-                                {
-                                    var sourceItem = Files.Source[index];
-
-                                    sourceItem.Path = Path.GetFullPath(item.Path).Replace(item.FullName, newValue);
-
-                                    sourceItem.Name = Path.GetFileNameWithoutExtension(sourceItem.Path);
-                                    sourceItem.FullName = Path.GetFileName(sourceItem.Path);
-                                    sourceItem.Extension = Path.GetExtension(sourceItem.Path);
-                                }
-                            });
+                            Files.UpdateSourceItem(item, destFileName);
                         });
-                        
-                        
-                        break;
-                    
-                    case ContentDialogResult.None:
-                    case ContentDialogResult.Secondary:
-                    default:
-                        break;
+                    });
                 }
             }
-            
-            
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
+#pragma warning disable CS8618
+
 namespace Gecko.App.Model
 {
     public partial class FileItem: ObservableObject

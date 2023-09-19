@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Windows.Data;
 using System.ComponentModel;
 using System.Collections.Generic;
@@ -24,6 +25,23 @@ namespace Gecko.App.Model
         public IEnumerable<FileItem> GetSelectedFiles()
         {
             return Filtered.Cast<FileItem>().Where(file => file.IsSelected);
+        }
+
+        
+        public void UpdateSourceItem(FileItem item, string path)
+        {
+            var index = Source.IndexOf(item);
+            if (index == -1)
+            {
+                return;
+            }
+            
+            item = Source[index];
+            
+            item.Path = path;
+            item.Name = Path.GetFileNameWithoutExtension(path);
+            item.FullName = Path.GetFileName(path);
+            item.Extension = Path.GetExtension(path);
         }
     }
 }
