@@ -1,0 +1,21 @@
+﻿<MUI:ContentDialog x:Class="Gecko.App.Modal.RenameDialog" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:MUI="http://schemas.modernwpf.com/2019" xmlns:ViewModel="clr-namespace:Gecko.App.ViewModel">
+    <MUI:ContentDialog.DataContext>
+        <ViewModel:RenameViewModel />
+    </MUI:ContentDialog.DataContext>
+    
+    <MUI:ContentDialog.Style>
+        <Style TargetType="MUI:ContentDialog">
+            <Setter Property="Title" Value="Rename selected files" />
+            <Setter Property="CloseButtonText" Value="Cancel" />
+            <Setter Property="PrimaryButtonText" Value="Rename" />
+        </Style>
+    </MUI:ContentDialog.Style>
+    
+    <MUI:SimpleStackPanel Spacing="6" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+        <TextBlock Text="Regex pattern" TextWrapping="Wrap" />
+        <TextBox Text="{Binding Pattern}" TextWrapping="Wrap" />
+        
+        <TextBlock Text="Replace to" TextWrapping="Wrap" />
+        <TextBox Text="{Binding Replace}" TextWrapping="Wrap" />
+    </MUI:SimpleStackPanel>
+</MUI:ContentDialog>

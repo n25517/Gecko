@@ -1,12 +1,15 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Windows;
 using Gecko.App.Model;
+using Gecko.App.Modal;
 using Gecko.App.Repository;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using Forms = System.Windows.Forms;
 using System.Text.RegularExpressions;
 using CommunityToolkit.Mvvm.ComponentModel;
+using ModernWpf.Controls;
 
 namespace Gecko.App.ViewModel
 {
@@ -90,6 +93,52 @@ namespace Gecko.App.ViewModel
             });
             
             Files.Filtered.Refresh();
+        }
+
+        [RelayCommand]
+        private async void RenameSelected()
+        {
+            var rename = new RenameDialog();
+            if (rename.DataContext is RenameViewModel)
+            {
+                var result = await rename.ShowAsync();
+                var context = rename.DataContext as RenameViewModel;
+                
+                switch (result)
+                {
+                    case ContentDialogResult.Primary:
+                        Parallel.ForEach(Files.GetSelectedFiles(), item =>
+                        {
+                            var newValue = Regex.Replace(item.FullName, context.Pattern, context.Replace).Trim();
+
+                            File.Move(Path.GetFullPath(item.Path), Path.GetFullPath(item.Path).Replace(item.FullName, newValue), true);
+                            App.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                var index = Files.Source.IndexOf(item);
+                                if (index != -1)
+                                {
+                                    var sourceItem = Files.Source[index];
+
+                                    sourceItem.Path = Path.GetFullPath(item.Path).Replace(item.FullName, newValue);
+
+                                    sourceItem.Name = Path.GetFileNameWithoutExtension(sourceItem.Path);
+                                    sourceItem.FullName = Path.GetFileName(sourceItem.Path);
+                                    sourceItem.Extension = Path.GetExtension(sourceItem.Path);
+                                }
+                            });
+                        });
+                        
+                        
+                        break;
+                    
+                    case ContentDialogResult.None:
+                    case ContentDialogResult.Secondary:
+                    default:
+                        break;
+                }
+            }
+            
+            
         }
     }
 }
