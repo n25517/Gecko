@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Windows.Data;
+using Gecko.App.Repository;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -10,38 +12,61 @@ namespace Gecko.App.Model
 {
     public partial class FileItems: ObservableObject
     {
+        private readonly string _path;
+        
         [ObservableProperty]
         private ICollectionView _filtered;
         
         [ObservableProperty]
         private ObservableCollection<FileItem> _source;
         
-        public FileItems(ObservableCollection<FileItem> source)
-        {
-            _source = source;
-            _filtered = CollectionViewSource.GetDefaultView(_source);
-        }
+        private readonly FileSystemWatcher _fileWatcher;
 
+        public FileItems(string path)
+        {
+            _path = path;
+            
+            _source = Explorer.GetFileItemsOnPath(path);
+            _filtered = CollectionViewSource.GetDefaultView(_source);
+            
+            _fileWatcher = new FileSystemWatcher(path);
+            
+            _fileWatcher.EnableRaisingEvents = true;
+            _fileWatcher.IncludeSubdirectories = true;
+            
+            _fileWatcher.Renamed += FileWatcherOnRenamed;
+            _fileWatcher.Deleted += FileWatcherOnDeleted;
+        }
+        
         public IEnumerable<FileItem> GetSelectedFiles()
         {
             return Filtered.Cast<FileItem>().Where(file => file.IsSelected);
         }
-
         
-        public void UpdateSourceItem(FileItem item, string path)
+        private void FileWatcherOnRenamed(object sender, RenamedEventArgs e)
         {
-            var index = Source.IndexOf(item);
-            if (index == -1)
+            App.Current.Dispatcher.BeginInvoke(() =>
             {
-                return;
-            }
+                if (!e.FullPath.Contains(_path))
+                {
+                    Source.Remove(Source.First(x => x.Path == e.OldFullPath));
+                    return;
+                }
+
+                var item = Source.First(x => x.Path == e.OldFullPath);
             
-            item = Source[index];
-            
-            item.Path = path;
-            item.Name = Path.GetFileNameWithoutExtension(path);
-            item.FullName = Path.GetFileName(path);
-            item.Extension = Path.GetExtension(path);
+                item.Path = e.FullPath;
+                item.Name = Path.GetFileNameWithoutExtension(e.FullPath);
+                item.FullName = Path.GetFileName(e.FullPath);
+                item.Extension = Path.GetExtension(e.FullPath);
+
+                item.IsSelected = false;
+            });
+        }
+
+        private void FileWatcherOnDeleted(object sender, FileSystemEventArgs e)
+        {
+            App.Current.Dispatcher.BeginInvoke(() => Source.Remove(Source.First(x => x.Path == e.FullPath)));
         }
     }
 }

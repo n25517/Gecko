@@ -2,7 +2,6 @@
 using System.Windows;
 using Gecko.App.Model;
 using Gecko.App.Modal;
-using Gecko.App.Repository;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using Forms = System.Windows.Forms;
@@ -15,7 +14,7 @@ namespace Gecko.App.ViewModel
     public partial class MainViewModel: ObservableObject
     {
         [ObservableProperty]
-        private FileItems _files = new(Explorer.GetFileItemsOnPath(App.Args["--path"]));
+        private FileItems _files = new(App.Args["--path"]);
         
         [RelayCommand]
         private void SelectAll()
@@ -76,8 +75,6 @@ namespace Gecko.App.ViewModel
             {
                 var path = dialog.SelectedPath + Path.DirectorySeparatorChar + item.FullName;
                 File.Move(Path.GetFullPath(item.Path),path, true);
-
-                App.Current.Dispatcher.BeginInvoke(() => Files.Source.Remove(item));
             });
         }
         
@@ -87,7 +84,6 @@ namespace Gecko.App.ViewModel
             Parallel.ForEach(Files.GetSelectedFiles(), item =>
             {
                 File.Delete(Path.GetFullPath(item.Path));
-                App.Current.Dispatcher.BeginInvoke(() => Files.Source.Remove(item));
             });
             
             Files.Filtered.Refresh();
@@ -110,10 +106,6 @@ namespace Gecko.App.ViewModel
                         var destFileName = Path.GetFullPath(item.Path).Replace(item.FullName, name.Trim());
                         
                         File.Move(Path.GetFullPath(item.Path), destFileName, true);
-                        App.Current.Dispatcher.BeginInvoke(() =>
-                        {
-                            Files.UpdateSourceItem(item, destFileName);
-                        });
                     });
                 }
             }
